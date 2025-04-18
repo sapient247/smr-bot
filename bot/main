@@ -1,0 +1,79 @@
+# main.py (упрощённая версия с SQL)
+import asyncio
+from datetime import datetime
+import sqlite3
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DB_PATH = os.getenv("DB_PATH", "bot_database.db")
+
+async def db_start():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id TEXT PRIMARY KEY,
+            first_name TEXT,
+            username TEXT,
+            last_name TEXT
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS items (
+            user_id TEXT,
+            user_name TEXT,
+            name TEXT,
+            description TEXT,
+            comment TEXT,
+            item_type TEXT,
+            timestamp TEXT
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS questions (
+            user_id TEXT,
+            username TEXT,
+            text TEXT,
+            timestamp TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+async def cmd_start_db(user_id, first_name, username, last_name):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    if not cursor.fetchone():
+        cursor.execute("INSERT INTO users VALUES (?, ?, ?, ?)", (user_id, first_name, username, last_name))
+        conn.commit()
+    conn.close()
+
+async def add_item(state, user_id, user_name):
+    async with state.proxy() as data:
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO items (user_id, user_name, name, description, comment, item_type, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (user_id, user_name, data['name'], data['desc'], data['comment'], data['type'], current_time))
+        conn.commit()
+        conn.close()
+
+async def record_question_and_answer(user_id, username, text):
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO questions (user_id, username, text, timestamp)
+        VALUES (?, ?, ?, ?)
+    ''', (user_id, username, text, current_time))
+    conn.commit()
+    conn.close()
+
+async def main():
+    await db_start()
+    await cmd_start_db("user123", "John", "j_doe", "Doe")
