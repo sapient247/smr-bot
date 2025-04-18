@@ -1,8 +1,8 @@
+
 # smr-bot
 smr-bot/
 ├── bot/                  # Telegram бот (код)
 │   ├── main.py
-
 │   ├── database.py
 │   └── ...
 ├── diagrams/             # Диаграммы из Draw.io
@@ -19,7 +19,6 @@ smr-bot/
 ├── .gitignore
 ├── README.md
 └── LICENSE
-
 Автоматизация сопровождения СМР через Telegram-бота
 Telegram Bot for Task Management (SQLite-based)
 
