@@ -1,0 +1,4 @@
+# .env.example
+
+# Path to your SQLite database file
+DB_PATH=bot_database.db
