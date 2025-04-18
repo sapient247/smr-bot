@@ -2,6 +2,7 @@
 smr-bot/
 ├── bot/                  # Telegram бот (код)
 │   ├── main.py
+
 │   ├── database.py
 │   └── ...
 ├── diagrams/             # Диаграммы из Draw.io
