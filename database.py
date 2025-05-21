@@ -1,69 +1,75 @@
-# Подготовка очищенного файла с демонстрационным кодом работы с Google Sheets API
-# Удалены ссылки, реальные имена пользователей, путь к credentials и реальные данные таблиц
+# database.py
 
-
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-import asyncio
-from datetime import datetime
+from abc import ABC, abstractmethod
+from clickhouse_driver import Client as CHClient
 import os
 
-# Использование переменных окружения
-credentials_file = os.getenv("GOOGLE_CREDENTIALS_FILE", "google_credentials.json")
-spreadsheet_url = os.getenv("SPREADSHEET_URL")
+class BaseStorage(ABC):
+    @abstractmethod
+    def create_request(self, user_id: int, request_type: str, payload: dict) -> int:
+        pass
 
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    @abstractmethod
+    def get_pending_requests(self) -> list[dict]:
+        pass
 
-# Авторизация
-creds = ServiceAccountCredentials.from_json_keyfile_name(credentials_file, scope)
-client = gspread.authorize(creds)
+    # ... другие методы доступа по аналогии с gspread-версией
 
-# Доступ к Google Sheets (используется переменная окружения)
-spreadsheet = client.open_by_url(spreadsheet_url)
-sheet = spreadsheet.worksheet("bot")
-directory = spreadsheet.worksheet("directory")
-sheet_question = spreadsheet.worksheet("questions")
+class SheetsStorage(BaseStorage):
+    def __init__(self, sheet_url: str, creds_json: str):
+        import gspread
+        from oauth2client.service_account import ServiceAccountCredentials
+        scope = ['https://spreadsheets.google.com/feeds']
+        creds = ServiceAccountCredentials.from_json_keyfile_name(creds_json, scope)
+        self.sheet = gspread.authorize(creds).open_by_url(sheet_url).sheet1
 
-# Инициализация БД
-async def db_start():
-    print("Database initialized")
+    def create_request(self, user_id: int, request_type: str, payload: dict) -> int:
+        row = [user_id, request_type, payload.get('text', ''), 'new']
+        return self.sheet.append_row(row)
 
-# Добавление пользователя при старте
-async def cmd_start_db(user_id, first_name, username, last_name):
-    records = directory.get_all_records()
-    user_exists = any(record.get("ID") == user_id for record in records)
+    def get_pending_requests(self) -> list[dict]:
+        records = self.sheet.get_all_records()
+        return [r for r in records if r['status'] == 'new']
 
-    if not user_exists:
-        directory.append_row([user_id, first_name, username, last_name])
-        print(f"New user added: {user_id}")
+    # ...
+
+class ClickHouseStorage(BaseStorage):
+    def __init__(self):
+        # Клиент ClickHouse внутри корпоративной сети
+        self.client = CHClient(
+            host=os.getenv('CH_HOST'),
+            port=os.getenv('CH_PORT', 9000),
+            user=os.getenv('CH_USER'),
+            password=os.getenv('CH_PASS'),
+            database=os.getenv('CH_DB')
+        )
+
+    def create_request(self, user_id: int, request_type: str, payload: dict) -> int:
+        # Предполагаем, что есть таблица smr_requests с автоинкрементом id
+        self.client.execute(
+            'INSERT INTO smr_requests (user_id, type, payload, status, created_at) VALUES',
+            [(user_id, request_type, payload, 'new', 'now()')]
+        )
+        # В ClickHouse нет автоинкремента, нужно возвращать, например, запись последнего batch_id
+        return 0  
+
+    def get_pending_requests(self) -> list[dict]:
+        rows = self.client.execute(
+            "SELECT id, user_id, type, payload FROM smr_requests WHERE status = 'new'"
+        )
+        return [
+            {'id': r[0], 'user_id': r[1], 'type': r[2], 'payload': r[3]}
+            for r in rows
+        ]
+
+    # ...
+
+# Выбор хранилища по переменной окружения
+def get_storage() -> BaseStorage:
+    if os.getenv('STORAGE_BACKEND') == 'clickhouse':
+        return ClickHouseStorage()
     else:
-        print(f"User already exists: {user_id}")
-
-# Добавление заявки
-async def add_item(state, user_id, user_name):
-    async with state.proxy() as data:
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        sheet.append_row([user_id, user_name, data.get('name'), data.get('desc'), data.get('comment'), data.get('type'), timestamp])
-        print("Item added")
-
-# Запись вопросов и ответов
-async def record_question_and_answer(user_id, username, text):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    sheet_question.append_row([user_id, username, text, timestamp])
-    print(f"Recorded Q&A for user {user_id}")
-
-# Тестовый запуск
-async def main():
-    await db_start()
-    await cmd_start_db("demo_user", "John", "john_doe", "Doe")
-    class DummyState:
-        async def proxy(self):
-            return {'name': 'Issue', 'desc': 'Some description', 'comment': 'Needs fixing', 'type': 'DemoType'}
-    await add_item(DummyState(), "demo_user", "John")
-    await record_question_and_answer("demo_user", "john_doe", "Sample question")
-
-if __name__ == "__main__":
-    asyncio.run(main())
-
-
-
+        return SheetsStorage(
+            sheet_url=os.getenv('SHEET_URL'),
+            creds_json=os.getenv('GOOGLE_CREDS')
+        )
