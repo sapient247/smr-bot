@@ -23,9 +23,12 @@ from aiogram.utils import executor
 import gspread
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.types import ParseMode
+from database import get_storage
 
+storage = get_storage()
 
-storage = MemoryStorage()
+storage.create_request(user_id, request_type, payload)
+
 load_dotenv()
 bot = Bot('')
 dp = Dispatcher(bot=bot, storage=storage)
