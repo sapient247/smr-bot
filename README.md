@@ -24,18 +24,17 @@
    cd smr-bot```
 
 **Создать и активировать виртуальное окружение**
-   ```python -m venv venv
+```python -m venv venv
    source venv/bin/activate   # Linux/Mac
    venv\Scripts\activate      # Windows```
 
-**Установить зависимости**
-      pip install -r requirements.txt```
+Установить зависимости
+```pip install -r requirements.txt```
 
-**Настроить .env**
-
-   BOT_TOKEN=your_telegram_bot_token
+Настроить .env
+```BOT_TOKEN=your_telegram_bot_token
    SPREADSHEET_URL=https://docs.google.com/spreadsheets/d/your_spreadsheet_id
-   CLICKHOUSE_DSN=clickhouse://user:pass@clickhouse.company.local:9000/db
+   CLICKHOUSE_DSN=clickhouse://user:pass@clickhouse.company.local:9000/db```
 
 ```python main.py
 smr-bot/
