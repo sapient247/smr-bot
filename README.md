@@ -21,23 +21,23 @@
 1. **Клонировать репозиторий**
    ```bash
    git clone https://github.com/sapient247/smr-bot.git
-   cd smr-bot
+   cd smr-bot```
 
 **Создать и активировать виртуальное окружение**
    ```bash
    python -m venv venv
    source venv/bin/activate   # Linux/Mac
-   venv\Scripts\activate      # Windows
+   venv\Scripts\activate      # Windows```
 
 **Установить зависимости**
    ```bash
-   pip install -r requirements.txt
+   pip install -r requirements.txt```
 
 **Настроить .env**
    ```bash
    BOT_TOKEN=your_telegram_bot_token
    SPREADSHEET_URL=https://docs.google.com/spreadsheets/d/your_spreadsheet_id
-   CLICKHOUSE_DSN=clickhouse://user:pass@clickhouse.company.local:9000/db
+   CLICKHOUSE_DSN=clickhouse://user:pass@clickhouse.company.local:9000/db```
 
 python main.py
 ```smr-bot/
