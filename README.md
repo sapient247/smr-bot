@@ -24,7 +24,8 @@
    cd smr-bot```
 
 **Создать и активировать виртуальное окружение**
-   ```bashpython -m venv venv
+   ```bash
+   python -m venv venv
    source venv/bin/activate   # Linux/Mac
    venv\Scripts\activate      # Windows```
 
