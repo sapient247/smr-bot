@@ -23,41 +23,39 @@
    git clone https://github.com/sapient247/smr-bot.git
    cd smr-bot
 
-Создать и активировать виртуальное окружение
+**Создать и активировать виртуальное окружение**
    ```bash
    python -m venv venv
    source venv/bin/activate   # Linux/Mac
    venv\Scripts\activate      # Windows
 
-Установить зависимости
+**Установить зависимости**
    ```bash
    pip install -r requirements.txt
 
-Настроить .env
+**Настроить .env**
    ```bash
    BOT_TOKEN=your_telegram_bot_token
    SPREADSHEET_URL=https://docs.google.com/spreadsheets/d/your_spreadsheet_id
    CLICKHOUSE_DSN=clickhouse://user:pass@clickhouse.company.local:9000/db
 
 python main.py
-```
-smr-bot/
-├── main.py # Точка входа, запуск бота
-├── database.py # ClickHouse / SQLite wrapper
-├── send_daily_reminders.py # Скрипт ежедневных напоминаний (APScheduler)
-├── keyboards.py # Inline и Reply клавиатуры
-├── handlers/ # Папка с модулями-обработчиками команд и FSM
-│ ├── start.py
-│ ├── ask.py
-│ └── ...
-├── utils/ # Вспомогательные функции
-│ ├── sheets.py # Google Sheets client
-│ └── notifications.py # Уведомления
-├── requirements.txt # Зависимости
-├── .env # Конфиденциальные настройки
-├── README.md # Этот файл
-└── google_credentials.json # Service Account для gspread
-```
+```smr-bot/
+├── main.py                   # Точка входа, запуск бота
+├── database.py               # ClickHouse / SQLite wrapper
+├── send_daily_reminders.py   # Скрипт ежедневных напоминаний (APScheduler)
+├── keyboards.py              # Inline и Reply клавиатуры
+├── handlers/                 # Папка с модулями-обработчиками команд и FSM
+│   ├── start.py
+│   ├── ask.py
+│   └── ...
+├── utils/                    # Вспомогательные функции
+│   ├── sheets.py             # Google Sheets client
+│   └── notifications.py      # Уведомления
+├── requirements.txt          # Зависимости
+├── .env                      # Конфиденциальные настройки
+├── README.md                 # Этот файл
+└── google_credentials.json   # Service Account для gspread```
 
 ✅ Возможности бота
 📜 Команды: /start, /help, /id, /ask
