@@ -37,7 +37,7 @@
    SPREADSHEET_URL=https://docs.google.com/spreadsheets/d/your_spreadsheet_id
    CLICKHOUSE_DSN=clickhouse://user:pass@clickhouse.company.local:9000/db
 
-python main.py
+```python main.py
 smr-bot/
 ├── main.py                   # Точка входа, запуск бота
 ├── database.py               # ClickHouse / SQLite wrapper
