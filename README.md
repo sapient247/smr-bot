@@ -19,6 +19,7 @@
 ## 🚀 Быстрый старт
 
 1. **Клонировать репозиторий**
+   ```bash
    git clone https://github.com/sapient247/smr-bot.git
    cd smr-bot```
 
