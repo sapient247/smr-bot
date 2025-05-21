@@ -19,12 +19,10 @@
 ## 🚀 Быстрый старт
 
 1. **Клонировать репозиторий**
-   ```bash
    git clone https://github.com/sapient247/smr-bot.git
    cd smr-bot```
 
 **Создать и активировать виртуальное окружение**
-   ```bash
    python -m venv venv
    source venv/bin/activate   # Linux/Mac
    venv\Scripts\activate      # Windows```
