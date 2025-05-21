@@ -30,17 +30,17 @@
    venv\Scripts\activate      # Windows```
 
 **Установить зависимости**
-   ```bash
-   pip install -r requirements.txt```
+      ```bash
+      pip install -r requirements.txt
 
 **Настроить .env**
-   ```bash
+
    BOT_TOKEN=your_telegram_bot_token
    SPREADSHEET_URL=https://docs.google.com/spreadsheets/d/your_spreadsheet_id
-   CLICKHOUSE_DSN=clickhouse://user:pass@clickhouse.company.local:9000/db```
+   CLICKHOUSE_DSN=clickhouse://user:pass@clickhouse.company.local:9000/db
 
 python main.py
-```smr-bot/
+smr-bot/
 ├── main.py                   # Точка входа, запуск бота
 ├── database.py               # ClickHouse / SQLite wrapper
 ├── send_daily_reminders.py   # Скрипт ежедневных напоминаний (APScheduler)
